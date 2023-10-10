@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Position Report</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<p>hello</p>
+<p>hello22</p>
+<script type="text/javascript">
+  /*  window.onload = setupRefresh;
+
+    function setupRefresh() {
+        setTimeout("refreshPage();", 5000); // refresh rate in milliseconds
+    }
+
+    function refreshPage() {
+        window.location = location.href;
+    }*/
+
+  let socket = new WebSocket('ws://'+window.location.host+'/ws');
+  socket.open = function (){
+      console.log('socket open')
+  };
+
+  socket.onmessage = function (msg){
+      let text ='';
+      let arrAC = msg.data.split("Aircraft");
+      let ac = '';
+
+      for (let i = 1; i < arrAC.length; i++) {
+          ac = (arrAC[i].endsWith(", "))
+                    ? arrAC[i].substring(0, arrAC[i].length - 2) : arrAC[i]
+
+          text+= "Aircraft"+ac+'\n\n';
+      }
+      document.getElementById("positions").innerText = text;
+  };
+
+  socket.onclose = function (){
+      console.log('socket closed')
+  }
+</script>
+<div class="positionlist">
+
+    <h2>Current Aircraft Positions</h2>
+    <label id="positions"></label>
+    <table>
+        <thead>
+        <tr>
+            <th>Call Sign</th>
+            <th>Squawk</th>
+            <th>AC Reg</th>
+            <th>Flight #</th>
+            <th>Route</th>
+            <th>AC Type</th>
+            <th>Altitude</th>
+            <th>Heading</th>
+            <th>Speed</th>
+            <th>Vert Rate</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Last Seen</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="ac : ${currentPositions}">
+            <td th:text="${ac.callsign}"></td>
+            <td th:text="${ac.squawk}"></td>
+            <td th:text="${ac.reg}"></td>
+            <td th:text="${ac.flightno}"></td>
+            <td th:text="${ac.route}"></td>
+            <td th:text="${ac.type}"></td>
+            <td th:text="${ac.altitude}"></td>
+            <td th:text="${ac.heading}"></td>
+            <td th:text="${ac.speed}"></td>
+            <td th:text="${ac.vertRate}"></td>
+            <td th:text="${ac.lat}"></td>
+            <td th:text="${ac.lon}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
